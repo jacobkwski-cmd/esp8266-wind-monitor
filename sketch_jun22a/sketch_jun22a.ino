@@ -232,13 +232,18 @@ void setup() {
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);
   Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
+  unsigned long wifiStart = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - wifiStart < 10000) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nHome IP: " + WiFi.localIP().toString());
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("\nHome IP: " + WiFi.localIP().toString());
+  } else {
+    Serial.println("\nHome WiFi not found, continuing in AP only mode");
+  }
   WiFi.softAP(ap_ssid, ap_pass);
-  Serial.println("AP IP:   192.168.4.1");
+  Serial.println("AP IP: 192.168.4.1");
 
   server.on("/", []() {
     server.send_P(200, "text/html", PAGE);
