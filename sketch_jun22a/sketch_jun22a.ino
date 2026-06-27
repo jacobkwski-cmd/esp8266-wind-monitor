@@ -3,7 +3,7 @@
 void setup() {
   Serial.begin(115200);
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("WindSensor", "12345678");
+  WiFi.softAP("Wind_Sensor", "12345678");
   Serial.println("AP started");
   Serial.println("IP: 192.168.4.1");
 }
