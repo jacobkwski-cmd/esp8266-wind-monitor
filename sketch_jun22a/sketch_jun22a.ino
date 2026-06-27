@@ -1,9 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <WebSocketsServer.h>
-
-const char* ssid     = "Station 6_IoT";
-const char* password = ".st1cky.0n3.";
+#include <DNSServer.h>
+#include <WiFiManager.h>
 
 const char* ap_ssid  = "WindSensor";
 const char* ap_pass  = "12345678";
@@ -229,19 +228,13 @@ void setup() {
   pinMode(HALL_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(HALL_PIN), hallISR, FALLING);
 
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  unsigned long wifiStart = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - wifiStart < 10000) {
-    delay(500);
-    Serial.print(".");
-  }
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.println("\nHome IP: " + WiFi.localIP().toString());
-  } else {
-    Serial.println("\nHome WiFi not found, continuing in AP only mode");
-  }
+  WiFiManager wifiManager;
+  wifiManager.setConfigPortalTimeout(60); // wait 60s for config, then continue anyway
+  wifiManager.autoConnect("WindSensor-Setup", "12345678");
+
+  Serial.println("WiFi connected, IP: " + WiFi.localIP().toString());
+
+  // Always also run as AP so you can access it directly
   WiFi.softAP(ap_ssid, ap_pass);
   Serial.println("AP IP: 192.168.4.1");
 
